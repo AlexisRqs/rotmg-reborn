@@ -3,6 +3,7 @@ import sys
 import math
 import random
 from enum import Enum
+import settings
 
 # Game settings
 WINDOW_WIDTH = 800
@@ -120,6 +121,10 @@ def show_start_menu(screen):
     start_position = (WINDOW_WIDTH // 2 - start_surface.get_width() // 2, WINDOW_HEIGHT // 2 + 50)
     screen.blit(start_surface, start_position)
 
+    settings_surface = font.render("Press S for Settings", True, (255, 255, 255))
+    settings_position = (WINDOW_WIDTH // 2 - settings_surface.get_width() // 2, WINDOW_HEIGHT // 2 + 100)
+    screen.blit(settings_surface, settings_position)
+
     pygame.display.flip()
 
     waiting = True
@@ -128,14 +133,19 @@ def show_start_menu(screen):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                waiting = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    waiting = False
+                    game_state = GameState.PLAYING
+                    score = 0
+                    return game_state, score
+                elif event.key == pygame.K_s:
+                    settings.show_settings_menu(screen)  # Call the settings menu from the settings module
 
     # Reset the game state and score
-    game_state = GameState.PLAYING
+    game_state = GameState.START
     score = 0
     return game_state, score
-
 
 
 def show_game_over_screen(screen, score):

@@ -131,6 +131,12 @@ def show_start_menu(screen):
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 waiting = False
 
+    # Reset the game state and score
+    game_state = GameState.PLAYING
+    score = 0
+    return game_state, score
+
+
 
 def show_game_over_screen(screen, score):
     screen.fill((0, 0, 0))  # Clear the screen with black color
@@ -168,6 +174,10 @@ def show_game_over_screen(screen, score):
                     waiting = False
                     return "MENU"
 
+    # Return the same state and score to continue the game
+    return GameState.GAME_OVER, score, reset_game
+
+
 
 def reset_game(player, all_sprites, bullets, enemies):
     player.rect.center = (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
@@ -195,15 +205,12 @@ def main():
     bullets = pygame.sprite.Group()
     enemies = pygame.sprite.Group()
 
-    score = 0
-
     game_state = GameState.START
+    score = 0
 
     while True:
         if game_state == GameState.START:
-            show_start_menu(screen)
-            game_state = GameState.PLAYING
-            score = 0
+            game_state, score = show_start_menu(screen)
 
         elif game_state == GameState.PLAYING:
             clock.tick(FPS)
@@ -255,13 +262,14 @@ def main():
 
         elif game_state == GameState.GAME_OVER:
             result = show_game_over_screen(screen, score)
+            score = reset_game(player, all_sprites, bullets, enemies)
             if result == "MENU":
                 game_state = GameState.START
+                screen.fill((0, 0, 0))  # Clear the screen
             elif result == "RESTART":
                 game_state = GameState.PLAYING
-                score = reset_game(player, all_sprites, bullets, enemies)
+                
 
 
 if __name__ == "__main__":
     main()
-

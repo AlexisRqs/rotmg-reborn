@@ -17,7 +17,7 @@ def load_settings():
     try:
         with open(SETTINGS_FILE, "r") as file:
             settings = json.load(file)
-    except FileNotFoundError:
+    except (FileNotFoundError, json.JSONDecodeError):
         settings = DEFAULT_SETTINGS
     return settings
 
@@ -26,45 +26,33 @@ def save_settings(settings):
     with open(SETTINGS_FILE, "w") as file:
         json.dump(settings, file)
 
-def show_settings_menu(screen):
+# Function to render text
+def render_text(text, selected):
     font = pygame.font.Font(None, 32)
+    color = (0, 255, 0) if selected else (255, 255, 255)
+    return font.render(text, True, color)
 
+def show_settings_menu(screen):
     settings = load_settings()
     selected_setting = "volume"  # Initialize the selected setting
 
-    volume_text = font.render(f"Volume: {settings['volume']}", True, (255, 255, 255))
-    volume_text_rect = volume_text.get_rect(center=(400, 200))
-
-    color_text = font.render(f"Player Color: {settings['color']}", True, (255, 255, 255))
-    color_text_rect = color_text.get_rect(center=(400, 250))
-
-    nickname_text = font.render(f"Nickname: {settings['nickname']}", True, (255, 255, 255))
-    nickname_text_rect = nickname_text.get_rect(center=(400, 300))
-
-    save_text = font.render("Press Enter to Save", True, (255, 255, 255))
+    save_text = render_text("Press Enter to Save", False)
     save_text_rect = save_text.get_rect(center=(400, 400))
 
     running = True
     while running:
         screen.fill((0, 0, 0))
 
-        # Render the selected setting with a different color
-        if selected_setting == "volume":
-            volume_text = font.render(f"Volume: {settings['volume']}", True, (0, 255, 0))
-        else:
-            volume_text = font.render(f"Volume: {settings['volume']}", True, (255, 255, 255))
+        volume_text = render_text(f"Volume: {settings['volume']}", selected_setting == "volume")
+        volume_text_rect = volume_text.get_rect(center=(400, 200))
         screen.blit(volume_text, volume_text_rect)
 
-        if selected_setting == "color":
-            color_text = font.render(f"Player Color: {settings['color']}", True, (0, 255, 0))
-        else:
-            color_text = font.render(f"Player Color: {settings['color']}", True, (255, 255, 255))
+        color_text = render_text(f"Player Color: {settings['color']}", selected_setting == "color")
+        color_text_rect = color_text.get_rect(center=(400, 250))
         screen.blit(color_text, color_text_rect)
 
-        if selected_setting == "nickname":
-            nickname_text = font.render(f"Nickname: {settings['nickname']}", True, (0, 255, 0))
-        else:
-            nickname_text = font.render(f"Nickname: {settings['nickname']}", True, (255, 255, 255))
+        nickname_text = render_text(f"Nickname: {settings['nickname']}", selected_setting == "nickname")
+        nickname_text_rect = nickname_text.get_rect(center=(400, 300))
         screen.blit(nickname_text, nickname_text_rect)
 
         screen.blit(save_text, save_text_rect)

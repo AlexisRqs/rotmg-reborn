@@ -32,11 +32,11 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        if keys[pygame.K_LEFT] or keys[pygame.K_s]:
             self.rect.x -= PLAYER_SPEED
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.rect.x += PLAYER_SPEED
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
+        if keys[pygame.K_UP] or keys[pygame.K_a]:
             self.rect.y -= PLAYER_SPEED
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
             self.rect.y += PLAYER_SPEED
@@ -134,31 +134,29 @@ def main():
         hits = pygame.sprite.groupcollide(enemies, bullets, True, True)
         for hit in hits:
             score += 1  # Increase the score when an enemy is hit.
-            enemy = Enemy()
-            enemies.add(enemy)
-            all_sprites.add(enemy)
 
         hits = pygame.sprite.spritecollide(player, enemies, False)
         if hits:
-            player.health -= 10
+            player.health -= 1
             if player.health <= 0:
                 running = False
 
         screen.fill((0, 0, 0))
         all_sprites.draw(screen)
 
-        score_surface = font.render(f'Score: {score}', True, (255, 255, 255))
-        screen.blit(score_surface, SCORE_POSITION)
-
         # Draw the health bar
         BAR_WIDTH = 200
         BAR_HEIGHT = 20
         BAR_COLOR = (255, 0, 0)  # Red
         BAR_BACKGROUND_COLOR = (50, 50, 50)  # Dark grey
-        health_bar_position = (SCORE_POSITION[0], SCORE_POSITION[1] + FONT_SIZE)
+        health_bar_position = (SCORE_POSITION[0], SCORE_POSITION[1])
         pygame.draw.rect(screen, BAR_BACKGROUND_COLOR, (*health_bar_position, BAR_WIDTH, BAR_HEIGHT))
         if player.health > 0:
             pygame.draw.rect(screen, BAR_COLOR, (*health_bar_position, player.health * 2, BAR_HEIGHT))
+
+        score_surface = font.render(f'Score: {score}', True, (255, 255, 255))
+        score_position = (SCORE_POSITION[0], SCORE_POSITION[1] + BAR_HEIGHT + 10)  # Position the score below the health bar with extra space
+        screen.blit(score_surface, score_position)
 
         pygame.display.flip()
 

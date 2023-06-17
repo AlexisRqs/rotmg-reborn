@@ -7,6 +7,8 @@ import random
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
 FPS = 60
+FONT_SIZE = 32
+SCORE_POSITION = (10, 10)  # top left of the screen
 
 # player settings
 PLAYER_SPEED = 5
@@ -94,10 +96,13 @@ class Enemy(pygame.sprite.Sprite):
 
 def main():
     pygame.init()
-    pygame.time.set_timer(SPAWN_ENEMY_EVENT, 1000)  # move this line inside the main()
+    pygame.time.set_timer(SPAWN_ENEMY_EVENT, 1000)
 
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     clock = pygame.time.Clock()
+
+    # Create a font object once and render() to create a Surface.
+    font = pygame.font.Font(None, FONT_SIZE)  # Use the default font and a size of 32.
 
     global player
     player = Player()
@@ -106,6 +111,8 @@ def main():
 
     bullets = pygame.sprite.Group()
     enemies = pygame.sprite.Group()
+
+    score = 0  # Start the score at 0.
 
     running = True
     while running:
@@ -116,37 +123,47 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # left click
                     player.shoot(bullets, event.pos)
-                    all_sprites.add(bullets)  # add the bullets to the all_sprites group
+                    all_sprites.add(bullets)
             if event.type == SPAWN_ENEMY_EVENT:
                 enemy = Enemy()
                 enemies.add(enemy)
                 all_sprites.add(enemy)
 
-        # update all sprites
         all_sprites.update()
 
-        # check for bullet-enemy collisions
         hits = pygame.sprite.groupcollide(enemies, bullets, True, True)
         for hit in hits:
+            score += 1  # Increase the score when an enemy is hit.
             enemy = Enemy()
             enemies.add(enemy)
             all_sprites.add(enemy)
 
-        # check for player-enemy collisions
         hits = pygame.sprite.spritecollide(player, enemies, False)
         if hits:
-            player.health -= 10  # decrease health by 10
+            player.health -= 10
             if player.health <= 0:
                 running = False
 
-        # update the display
         screen.fill((0, 0, 0))
         all_sprites.draw(screen)
+
+        score_surface = font.render(f'Score: {score}', True, (255, 255, 255))
+        screen.blit(score_surface, SCORE_POSITION)
+
+        # Draw the health bar
+        BAR_WIDTH = 200
+        BAR_HEIGHT = 20
+        BAR_COLOR = (255, 0, 0)  # Red
+        BAR_BACKGROUND_COLOR = (50, 50, 50)  # Dark grey
+        health_bar_position = (SCORE_POSITION[0], SCORE_POSITION[1] + FONT_SIZE)
+        pygame.draw.rect(screen, BAR_BACKGROUND_COLOR, (*health_bar_position, BAR_WIDTH, BAR_HEIGHT))
+        if player.health > 0:
+            pygame.draw.rect(screen, BAR_COLOR, (*health_bar_position, player.health * 2, BAR_HEIGHT))
+
         pygame.display.flip()
 
     pygame.quit()
     sys.exit()
-
 
 if __name__ == "__main__":
     main()

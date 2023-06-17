@@ -1,66 +1,65 @@
 import pygame
 import sys
-import math
 
-# Initialize Pygame
-pygame.init()
+# game settings
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 600
+FPS = 60
 
-# Set up some constants
-WIDTH, HEIGHT = 640, 480
-PLAYER_SIZE = 50
-PLAYER_SPEED = 1
-PROJECTILE_SPEED = 1
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-BLACK = (0, 0, 0)
+# player settings
+PLAYER_SPEED = 5
 
-# Set up the display
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface((50, 50))
+        self.image.fill((0, 255, 0))
+        self.rect = self.image.get_rect()
+        self.rect.center = (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
 
-# Set up the player
-player = pygame.Rect(WIDTH // 2, HEIGHT // 2, PLAYER_SIZE, PLAYER_SIZE)
+    def update(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            self.rect.x -= PLAYER_SPEED
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            self.rect.x += PLAYER_SPEED
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            self.rect.y -= PLAYER_SPEED
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            self.rect.y += PLAYER_SPEED
 
-# Set up the projectiles
-projectiles = []
+        # boundary conditions
+        if self.rect.left < 0: self.rect.left = 0
+        if self.rect.right > WINDOW_WIDTH: self.rect.right = WINDOW_WIDTH
+        if self.rect.top < 0: self.rect.top = 0
+        if self.rect.bottom > WINDOW_HEIGHT: self.rect.bottom = WINDOW_HEIGHT
 
-# Start the game loop
-while True:
-    # Event handling
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            # Get the mouse position
-            mx, my = pygame.mouse.get_pos()
-            # Calculate the direction vector from the player to the mouse
-            dx, dy = mx - player.centerx, my - player.centery
-            dist = math.hypot(dx, dy)
-            dx, dy = dx / dist, dy / dist  # Normalize the direction vector
-            # Create a new projectile and add it to the list
-            projectiles.append((pygame.Rect(player.centerx, player.centery, 10, 10), dx, dy))
+def main():
+    pygame.init()
 
-    # Player movement
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        player.x -= PLAYER_SPEED
-    if keys[pygame.K_RIGHT]:
-        player.x += PLAYER_SPEED
-    if keys[pygame.K_UP]:
-        player.y -= PLAYER_SPEED
-    if keys[pygame.K_DOWN]:
-        player.y += PLAYER_SPEED
+    screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    clock = pygame.time.Clock()
 
-    # Move the projectiles
-    for proj, dx, dy in projectiles:
-        proj.x += dx * PROJECTILE_SPEED
-        proj.y += dy * PROJECTILE_SPEED
+    player = Player()
+    all_sprites = pygame.sprite.Group()
+    all_sprites.add(player)
 
-    # Draw everything
-    screen.fill(WHITE)
-    pygame.draw.rect(screen, RED, player)
-    for proj, _, _ in projectiles:
-        pygame.draw.rect(screen, BLACK, proj)
+    running = True
+    while running:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
-    # Flip the display
-    pygame.display.flip()
+        all_sprites.update()
+
+        screen.fill((0, 0, 0))
+        all_sprites.draw(screen)
+
+        pygame.display.flip()
+
+    pygame.quit()
+    sys.exit()
+
+if __name__ == "__main__":
+    main()

@@ -8,8 +8,8 @@ pygame.init()
 # Set up some constants
 WIDTH, HEIGHT = 640, 480
 PLAYER_SIZE = 50
-PLAYER_SPEED = 5
-PROJECTILE_SPEED = 10
+PLAYER_SPEED = 1
+PROJECTILE_SPEED = 1
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)

@@ -34,7 +34,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.Surface((50, 50))
-        self.image.fill((0, 255, 0))
+        self.image.fill(settings.PLAYER_COLOR)
         self.rect = self.image.get_rect()
         self.rect.center = (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
         self.health = PLAYER_HEALTH

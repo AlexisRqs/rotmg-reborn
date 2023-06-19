@@ -2,6 +2,8 @@ import pygame
 import sys
 import json
 
+PLAYER_COLOR = (0, 255, 0)  # RGB for greenA
+
 # Settings file path
 SETTINGS_FILE = "settings.json"
 
@@ -9,7 +11,7 @@ SETTINGS_FILE = "settings.json"
 DEFAULT_SETTINGS = {
     "volume": 0.5,
     "color": (255, 0, 0),
-    "nickname": "Player"
+    "nickname": "Alex"
 }
 
 # Load settings from file
@@ -71,14 +73,14 @@ def show_settings_menu(screen):
                     if selected_setting == "volume":
                         settings['volume'] = min(settings['volume'] + 0.1, 1.0)
                     elif selected_setting == "color":
-                        settings['color'] = (settings['color'][0] + 10, settings['color'][1], settings['color'][2])
+                        settings['color'] = (min(settings['color'][0] + 10, 255), settings['color'][1], settings['color'][2])
                     elif selected_setting == "nickname":
                         pass  # Ignore the up arrow key for the nickname setting
                 elif event.key == pygame.K_LEFT:
                     if selected_setting == "volume":
                         settings['volume'] = max(settings['volume'] - 0.1, 0.0)
                     elif selected_setting == "color":
-                        settings['color'] = (settings['color'][0] - 10, settings['color'][1], settings['color'][2])
+                        settings['color'] = (max(settings['color'][0] - 10, 0), settings['color'][1], settings['color'][2])
                     elif selected_setting == "nickname":
                         pass  # Ignore the down arrow key for the nickname setting
                 elif event.key == pygame.K_UP:
@@ -96,7 +98,7 @@ def show_settings_menu(screen):
                     elif selected_setting == "nickname":
                         selected_setting = "volume"
                 elif event.key == pygame.K_BACKSPACE and selected_setting == "nickname":
-                    settings['nickname'] = settings['nickname'][:-1]
+                        settings['nickname'] = settings['nickname'][:-1]
                 else:
-                    if selected_setting == "nickname":
+                    if selected_setting == "nickname" and len(settings['nickname']) < 10 and event.unicode.isalnum():
                         settings['nickname'] += event.unicode
